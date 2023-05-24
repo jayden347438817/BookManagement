@@ -1,6 +1,10 @@
 package com.example.bookmanagement.mapper;
-import com.example.bookmanagement.entity.Book;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
-public interface BookMapper extends BaseMapper<Book>{
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.example.bookmanagement.entity.Book;
+import org.apache.ibatis.annotations.Mapper;
+
+@Mapper
+public interface BookMapper extends BaseMapper<Book> {
+
 }

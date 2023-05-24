@@ -5,6 +5,9 @@ import com.example.bookmanagement.mapper.BookMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +25,7 @@ public class BookController {
     @Operation(summary = "查询所有图书",description = "成功返回含有全部书籍的list")
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
+    @Cacheable(value = "books")
     public Iterable<Book> getAllBooks() {
         List<Book> books = bookMapper.selectList(null);
         return books;
@@ -29,6 +33,7 @@ public class BookController {
     @Operation(summary = "根据ID查询单个图书",description = "成功返回状态码200和对应书本信息")
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
+    @Cacheable(value = "book", key = "#id")
     public Book getBookById(@PathVariable("id") Long id) {
         Book book = bookMapper.selectById(id);
         return book;
@@ -36,6 +41,7 @@ public class BookController {
     @Operation(summary = "添加图书",description = "创建成功201请求有误400")
     @PostMapping("")
     @ResponseStatus(HttpStatus.OK)
+    @CachePut(value = "book", key = "#book.id")
     public Book createBook(@RequestBody Book book) {
         bookMapper.insert(book);
         return book;
@@ -43,6 +49,7 @@ public class BookController {
     @Operation(summary = "更新图书",description = "成功200记录不存在404")
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
+    @CachePut(value = "book", key = "#book.id")
     public ResponseEntity<Book> updateBook(@PathVariable("id") Long id, @RequestBody Book book) {
         Book book1 = bookMapper.selectById(id);
         if (book1 != null) {
@@ -58,6 +65,7 @@ public class BookController {
     @Operation(summary = "删除图书",description = "成功200记录不存在404")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
+    @CacheEvict(value = "book", key = "#id")
     public void deleteBook(@PathVariable("id") Long id) {
         if (bookMapper.selectById(id) != null) {
             bookMapper.deleteById(id);
